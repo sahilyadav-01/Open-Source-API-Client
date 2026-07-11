@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/key_value_item.dart';
 import '../providers/client_provider.dart';
 
-class RequestEditor extends StatefulWidget {
+class RequestEditor extends ConsumerStatefulWidget {
   const RequestEditor({super.key});
 
   @override
-  State<RequestEditor> createState() => _RequestEditorState();
+  ConsumerState<RequestEditor> createState() => _RequestEditorState();
 }
 
-class _RequestEditorState extends State<RequestEditor> with SingleTickerProviderStateMixin {
+class _RequestEditorState extends ConsumerState<RequestEditor> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late TextEditingController _bodyController;
 
@@ -17,10 +18,10 @@ class _RequestEditorState extends State<RequestEditor> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    final provider = Provider.of<ClientProvider>(context, listen: false);
-    _bodyController = TextEditingController(text: provider.body);
+    final initialBody = ref.read(clientProvider).body;
+    _bodyController = TextEditingController(text: initialBody);
     _bodyController.addListener(() {
-      provider.setBody(_bodyController.text);
+      ref.read(clientProvider.notifier).setBody(_bodyController.text);
     });
   }
 
@@ -33,14 +34,15 @@ class _RequestEditorState extends State<RequestEditor> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ClientProvider>(context);
+    final clientState = ref.watch(clientProvider);
+    final clientNotifier = ref.read(clientProvider.notifier);
 
     // Sync body if updated from history
-    if (_bodyController.text != provider.body) {
-      _bodyController.text = provider.body;
+    if (_bodyController.text != clientState.body) {
+      _bodyController.text = clientState.body;
     }
 
-    final isBodySupported = provider.method != 'GET' && provider.method != 'HEAD';
+    final isBodySupported = clientState.method != 'GET' && clientState.method != 'HEAD';
 
     return Card(
       margin: const EdgeInsets.all(16),
@@ -63,22 +65,22 @@ class _RequestEditorState extends State<RequestEditor> with SingleTickerProvider
               children: [
                 // Params Tab
                 _buildKeyValueList(
-                  items: provider.params,
-                  onAdd: provider.addParam,
-                  onDelete: provider.removeParam,
-                  onKeyChanged: (index, val) => provider.updateParam(index, key: val),
-                  onValueChanged: (index, val) => provider.updateParam(index, value: val),
-                  onToggle: (index, val) => provider.updateParam(index, isEnabled: val),
+                  items: clientState.params,
+                  onAdd: clientNotifier.addParam,
+                  onDelete: clientNotifier.removeParam,
+                  onKeyChanged: (index, val) => clientNotifier.updateParam(index, key: val),
+                  onValueChanged: (index, val) => clientNotifier.updateParam(index, value: val),
+                  onToggle: (index, val) => clientNotifier.updateParam(index, isEnabled: val),
                   emptyMessage: 'No query parameters added yet.',
                 ),
                 // Headers Tab
                 _buildKeyValueList(
-                  items: provider.headers,
-                  onAdd: provider.addHeader,
-                  onDelete: provider.removeHeader,
-                  onKeyChanged: (index, val) => provider.updateHeader(index, key: val),
-                  onValueChanged: (index, val) => provider.updateHeader(index, value: val),
-                  onToggle: (index, val) => provider.updateHeader(index, isEnabled: val),
+                  items: clientState.headers,
+                  onAdd: clientNotifier.addHeader,
+                  onDelete: clientNotifier.removeHeader,
+                  onKeyChanged: (index, val) => clientNotifier.updateHeader(index, key: val),
+                  onValueChanged: (index, val) => clientNotifier.updateHeader(index, value: val),
+                  onToggle: (index, val) => clientNotifier.updateHeader(index, isEnabled: val),
                   emptyMessage: 'No headers added yet.',
                 ),
                 // Body Tab
@@ -118,7 +120,7 @@ class _RequestEditorState extends State<RequestEditor> with SingleTickerProvider
                               Icon(Icons.info_outline, size: 48, color: Colors.grey[600]),
                               const SizedBox(height: 12),
                               Text(
-                                '${provider.method} requests do not support a request body.',
+                                '${clientState.method} requests do not support a request body.',
                                 style: const TextStyle(color: Colors.grey),
                               ),
                             ],

@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/client_provider.dart';
 
-class ResponseViewer extends StatefulWidget {
+class ResponseViewer extends ConsumerStatefulWidget {
   const ResponseViewer({super.key});
 
   @override
-  State<ResponseViewer> createState() => _ResponseViewerState();
+  ConsumerState<ResponseViewer> createState() => _ResponseViewerState();
 }
 
-class _ResponseViewerState extends State<ResponseViewer> with SingleTickerProviderStateMixin {
+class _ResponseViewerState extends ConsumerState<ResponseViewer> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -27,10 +27,10 @@ class _ResponseViewerState extends State<ResponseViewer> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ClientProvider>(context);
-    final response = provider.currentResponse;
+    final clientState = ref.watch(clientProvider);
+    final response = clientState.currentResponse;
 
-    if (provider.isLoading) {
+    if (clientState.isLoading) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -68,10 +68,10 @@ class _ResponseViewerState extends State<ResponseViewer> with SingleTickerProvid
       // Not a JSON response, keep raw body
     }
 
-    final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
+    final isPageSuccess = response.statusCode >= 200 && response.statusCode < 300;
     final statusColor = response.statusCode == -1
         ? Colors.redAccent
-        : (isSuccess ? const Color(0xFF10B981) : const Color(0xFFEF4444));
+        : (isPageSuccess ? const Color(0xFF10B981) : const Color(0xFFEF4444));
 
     return Card(
       margin: const EdgeInsets.all(16),

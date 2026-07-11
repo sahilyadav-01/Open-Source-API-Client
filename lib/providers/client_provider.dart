@@ -1,117 +1,116 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../models/key_value_item.dart';
 import '../models/request_item.dart';
 import '../services/api_service.dart';
+import '../services/database_service.dart';
 
-class KeyValueItem {
-  String key;
-  String value;
-  bool isEnabled;
+part 'client_provider.freezed.dart';
+part 'client_provider.g.dart';
 
-  KeyValueItem({this.key = '', this.value = '', this.isEnabled = true});
+@freezed
+class ClientState with _$ClientState {
+  const factory ClientState({
+    @Default('GET') String method,
+    @Default('https://jsonplaceholder.typicode.com/posts/1') String url,
+    @Default([KeyValueItem(key: 'Accept', value: '*/*')]) List<KeyValueItem> headers,
+    @Default([]) List<KeyValueItem> params,
+    @Default('') String body,
+    @Default(false) bool isLoading,
+    ResponseItem? currentResponse,
+    @Default([]) List<RequestItem> history,
+  }) = _ClientState;
 }
 
-class ClientProvider with ChangeNotifier {
-  String _method = 'GET';
-  String _url = 'https://jsonplaceholder.typicode.com/posts/1';
-  List<KeyValueItem> _headers = [
-    KeyValueItem(key: 'Accept', value: '*/*'),
-  ];
-  List<KeyValueItem> _params = [];
-  String _body = '';
-  bool _isLoading = false;
-  ResponseItem? _currentResponse;
-  List<RequestItem> _history = [];
-
-  ClientProvider() {
-    loadHistory();
+@riverpod
+class Client extends _$Client {
+  @override
+  ClientState build() {
+    // Load history asynchronously
+    _loadHistory();
+    return const ClientState();
   }
 
-  // Getters
-  String get method => _method;
-  String get url => _url;
-  List<KeyValueItem> get headers => _headers;
-  List<KeyValueItem> get params => _params;
-  String get body => _body;
-  bool get isLoading => _isLoading;
-  ResponseItem? get currentResponse => _currentResponse;
-  List<RequestItem> get history => _history;
+  Future<void> _loadHistory() async {
+    final history = await DatabaseService.getHistory();
+    state = state.copyWith(history: history);
+  }
 
-  // Setters & state mutators
   void setMethod(String val) {
-    _method = val;
-    notifyListeners();
+    state = state.copyWith(method: val);
   }
 
   void setUrl(String val) {
-    _url = val;
-    notifyListeners();
+    state = state.copyWith(url: val);
   }
 
   void setBody(String val) {
-    _body = val;
-    notifyListeners();
+    state = state.copyWith(body: val);
   }
 
   void addHeader() {
-    _headers.add(KeyValueItem());
-    notifyListeners();
+    state = state.copyWith(headers: [...state.headers, const KeyValueItem()]);
   }
 
   void removeHeader(int index) {
-    if (_headers.length > index) {
-      _headers.removeAt(index);
-      notifyListeners();
+    if (state.headers.length > index) {
+      final updated = List<KeyValueItem>.from(state.headers)..removeAt(index);
+      state = state.copyWith(headers: updated);
     }
   }
 
   void updateHeader(int index, {String? key, String? value, bool? isEnabled}) {
-    if (_headers.length > index) {
-      if (key != null) _headers[index].key = key;
-      if (value != null) _headers[index].value = value;
-      if (isEnabled != null) _headers[index].isEnabled = isEnabled;
-      notifyListeners();
+    if (state.headers.length > index) {
+      final updated = List<KeyValueItem>.from(state.headers);
+      final current = updated[index];
+      updated[index] = current.copyWith(
+        key: key ?? current.key,
+        value: value ?? current.value,
+        isEnabled: isEnabled ?? current.isEnabled,
+      );
+      state = state.copyWith(headers: updated);
     }
   }
 
   void addParam() {
-    _params.add(KeyValueItem());
-    notifyListeners();
+    state = state.copyWith(params: [...state.params, const KeyValueItem()]);
   }
 
   void removeParam(int index) {
-    if (_params.length > index) {
-      _params.removeAt(index);
-      notifyListeners();
+    if (state.params.length > index) {
+      final updated = List<KeyValueItem>.from(state.params)..removeAt(index);
+      state = state.copyWith(params: updated);
     }
   }
 
   void updateParam(int index, {String? key, String? value, bool? isEnabled}) {
-    if (_params.length > index) {
-      if (key != null) _params[index].key = key;
-      if (value != null) _params[index].value = value;
-      if (isEnabled != null) _params[index].isEnabled = isEnabled;
-      notifyListeners();
+    if (state.params.length > index) {
+      final updated = List<KeyValueItem>.from(state.params);
+      final current = updated[index];
+      updated[index] = current.copyWith(
+        key: key ?? current.key,
+        value: value ?? current.value,
+        isEnabled: isEnabled ?? current.isEnabled,
+      );
+      state = state.copyWith(params: updated);
     }
   }
 
   void clearResponse() {
-    _currentResponse = null;
-    notifyListeners();
+    state = state.copyWith(currentResponse: null);
   }
 
-  // Helper to construct a RequestItem from current state
+  // Construct request item from active state
   RequestItem get _currentRequestItem {
     final Map<String, String> headersMap = {};
-    for (var item in _headers) {
+    for (var item in state.headers) {
       if (item.isEnabled && item.key.trim().isNotEmpty) {
         headersMap[item.key.trim()] = item.value;
       }
     }
 
     final Map<String, String> paramsMap = {};
-    for (var item in _params) {
+    for (var item in state.params) {
       if (item.isEnabled && item.key.trim().isNotEmpty) {
         paramsMap[item.key.trim()] = item.value;
       }
@@ -119,88 +118,65 @@ class ClientProvider with ChangeNotifier {
 
     return RequestItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      method: _method,
-      url: _url,
+      method: state.method,
+      url: state.url,
       headers: headersMap,
       params: paramsMap,
-      body: _body,
+      body: state.body,
     );
   }
 
   // Load a historic request into the editor
   void loadRequest(RequestItem item) {
-    _method = item.method;
-    _url = item.url;
-    _body = item.body;
-    _currentResponse = item.response;
+    final List<KeyValueItem> newHeaders = item.headers.entries
+        .map((e) => KeyValueItem(key: e.key, value: e.value))
+        .toList();
+    final List<KeyValueItem> newParams = item.params.entries
+        .map((e) => KeyValueItem(key: e.key, value: e.value))
+        .toList();
 
-    _headers = item.headers.entries.map((e) => KeyValueItem(key: e.key, value: e.value)).toList();
-    _params = item.params.entries.map((e) => KeyValueItem(key: e.key, value: e.value)).toList();
-
-    notifyListeners();
+    state = state.copyWith(
+      method: item.method,
+      url: item.url,
+      body: item.body,
+      headers: newHeaders,
+      params: newParams,
+      currentResponse: item.response,
+    );
   }
 
   // Execute request
   Future<void> sendRequest() async {
-    _isLoading = true;
-    _currentResponse = null;
-    notifyListeners();
+    state = state.copyWith(isLoading: true, currentResponse: null);
 
     final req = _currentRequestItem;
     final res = await ApiService.sendRequest(req);
 
-    _currentResponse = res;
-    _isLoading = false;
-
-    // Add to history with response
+    // Save history item with response
     final historyItem = req.copyWith(response: res);
-    
-    // Check if duplicate (same url, method, body, headers, params), remove old one if exists to keep list clean
-    _history.removeWhere((item) => 
-      item.url == historyItem.url && 
-      item.method == historyItem.method && 
-      item.body == historyItem.body
+    await DatabaseService.saveRequest(historyItem);
+
+    // Reload history list from DB
+    final history = await DatabaseService.getHistory();
+
+    state = state.copyWith(
+      currentResponse: res,
+      isLoading: false,
+      history: history,
     );
-    
-    _history.insert(0, historyItem);
-    saveHistory();
-    notifyListeners();
-  }
-
-  // History persistence
-  Future<void> loadHistory() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? historyJson = prefs.getString('api_history');
-      if (historyJson != null) {
-        final List<dynamic> list = json.decode(historyJson);
-        _history = list.map((item) => RequestItem.fromJson(item as Map<String, dynamic>)).toList();
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint('Error loading history: $e');
-    }
-  }
-
-  Future<void> saveHistory() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String historyJson = json.encode(_history.map((item) => item.toJson()).toList());
-      await prefs.setString('api_history', historyJson);
-    } catch (e) {
-      debugPrint('Error saving history: $e');
-    }
   }
 
   Future<void> clearHistory() async {
-    _history.clear();
-    saveHistory();
-    notifyListeners();
+    await DatabaseService.clearHistory();
+    state = state.copyWith(history: []);
   }
 
-  void deleteHistoryItem(String id) {
-    _history.removeWhere((item) => item.id == id);
-    saveHistory();
-    notifyListeners();
+  Future<void> deleteHistoryItem(String id) async {
+    final parsedId = int.tryParse(id);
+    if (parsedId != null) {
+      await DatabaseService.deleteItem(parsedId);
+      final history = await DatabaseService.getHistory();
+      state = state.copyWith(history: history);
+    }
   }
 }

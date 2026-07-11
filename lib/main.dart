@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'providers/client_provider.dart';
-import 'screens/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'routing/router.dart';
+import 'services/database_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Isar database caching
+  await DatabaseService.init();
+
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ClientProvider()),
-      ],
-      child: const OpenSourceApiClientApp(),
+    const ProviderScope(
+      child: OpenSourceApiClientApp(),
     ),
   );
 }
 
-class OpenSourceApiClientApp extends StatelessWidget {
+class OpenSourceApiClientApp extends ConsumerWidget {
   const OpenSourceApiClientApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final goRouter = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'Antigravity API Client',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark, // Default to a gorgeous dark mode
+      themeMode: ThemeMode.dark, // Keep gorgeous dark mode
+      routerConfig: goRouter,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // Tailwind Slate 900
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // Slate 900
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFF6366F1), // Indigo 500
           secondary: Color(0xFF10B981), // Emerald 500
@@ -59,7 +63,6 @@ class OpenSourceApiClientApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
     );
   }
 }

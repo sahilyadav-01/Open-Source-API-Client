@@ -1,0 +1,24 @@
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        generate_for:
+          include:
+            - lib/providers/**
+            - lib/routing/**
+      isar_community_generator:
+        generate_for:
+          include:
+            - lib/models/request_history.dart
+      freezed:freezed:
+        generate_for:
+          include:
+            - lib/models/key_value_item.dart
+            - lib/models/request_item.dart
+            - lib/providers/client_provider.dart
+      json_serializable:
+        options:
+          explicit_to_json: true
+        generate_for:
+          include:
+            - lib/models/**

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/client_provider.dart';
 import '../models/request_item.dart';
 
-class HistorySidebar extends StatelessWidget {
+class HistorySidebar extends ConsumerWidget {
   const HistorySidebar({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<ClientProvider>(context);
-    final history = provider.history;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clientState = ref.watch(clientProvider);
+    final clientNotifier = ref.read(clientProvider.notifier);
+    final history = clientState.history;
 
     return Container(
       color: const Color(0xFF0B1220), // Dark slate 950
@@ -38,7 +39,7 @@ class HistorySidebar extends StatelessWidget {
                 ),
                 if (history.isNotEmpty)
                   TextButton(
-                    onPressed: () => provider.clearHistory(),
+                    onPressed: () => clientNotifier.clearHistory(),
                     child: const Text('Clear All', style: TextStyle(fontSize: 12, color: Colors.grey)),
                   ),
               ],
@@ -69,7 +70,7 @@ class HistorySidebar extends StatelessWidget {
                     itemCount: history.length,
                     itemBuilder: (context, index) {
                       final item = history[index];
-                      return _buildHistoryItem(context, provider, item);
+                      return _buildHistoryItem(context, clientNotifier, item);
                     },
                   ),
           ),
@@ -78,12 +79,12 @@ class HistorySidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(BuildContext context, ClientProvider provider, RequestItem item) {
+  Widget _buildHistoryItem(BuildContext context, Client clientNotifier, RequestItem item) {
     final methodColor = _getMethodColor(item.method);
     
     return InkWell(
       onTap: () {
-        provider.loadRequest(item);
+        clientNotifier.loadRequest(item);
         // If we are on mobile/drawer, close drawer
         if (Scaffold.of(context).isDrawerOpen) {
           Navigator.pop(context);
@@ -158,7 +159,7 @@ class HistorySidebar extends StatelessWidget {
             // Delete button
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 16, color: Colors.grey),
-              onPressed: () => provider.deleteHistoryItem(item.id),
+              onPressed: () => clientNotifier.deleteHistoryItem(item.id),
               hoverColor: Colors.red.withValues(alpha: 0.1),
               tooltip: 'Delete',
             ),

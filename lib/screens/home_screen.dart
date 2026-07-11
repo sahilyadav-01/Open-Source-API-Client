@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 import '../providers/client_provider.dart';
 import '../widgets/request_editor.dart';
 import '../widgets/response_viewer.dart';
 import '../widgets/history_sidebar.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _urlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Synchronize URL field with provider
-    final provider = Provider.of<ClientProvider>(context, listen: false);
-    _urlController.text = provider.url;
+    // Synchronize URL field with provider initial value
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final initialUrl = ref.read(clientProvider).url;
+      _urlController.text = initialUrl;
+    });
+
     _urlController.addListener(() {
-      provider.setUrl(_urlController.text);
+      ref.read(clientProvider.notifier).setUrl(_urlController.text);
     });
   }
 
@@ -34,11 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ClientProvider>(context);
+    final clientState = ref.watch(clientProvider);
+    final clientNotifier = ref.read(clientProvider.notifier);
 
     // Sync input controller value if it was loaded from history
-    if (_urlController.text != provider.url) {
-      _urlController.text = provider.url;
+    if (_urlController.text != clientState.url) {
+      _urlController.text = clientState.url;
     }
 
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -62,11 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    value: provider.method,
-                    onChanged: provider.isLoading
+                    value: clientState.method,
+                    onChanged: clientState.isLoading
                         ? null
                         : (val) {
-                            if (val != null) provider.setMethod(val);
+                            if (val != null) clientNotifier.setMethod(val);
                           },
                     items: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD']
                         .map((method) => DropdownMenuItem(
@@ -88,14 +93,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: TextField(
                   controller: _urlController,
-                  enabled: !provider.isLoading,
+                  enabled: !clientState.isLoading,
                   decoration: const InputDecoration(
                     hintText: 'Enter API URL (e.g. jsonplaceholder.typicode.com/posts)',
                     prefixIcon: Icon(Icons.link, color: Color(0xFF94A3B8)),
                   ),
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 14),
                   onSubmitted: (_) {
-                    if (!provider.isLoading) provider.sendRequest();
+                    if (!clientState.isLoading) clientNotifier.sendRequest();
                   },
                 ),
               ),
@@ -104,8 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 48,
                 child: ElevatedButton.icon(
-                  onPressed: provider.isLoading ? null : () => provider.sendRequest(),
-                  icon: provider.isLoading
+                  onPressed: clientState.isLoading ? null : () => clientNotifier.sendRequest(),
+                  icon: clientState.isLoading
                       ? const SizedBox(
                           width: 16,
                           height: 16,
@@ -115,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                       : const Icon(Icons.send, size: 16),
-                  label: Text(provider.isLoading ? 'Sending...' : 'Send'),
+                  label: Text(clientState.isLoading ? 'Sending...' : 'Send'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6366F1),
                     foregroundColor: Colors.white,
@@ -135,17 +140,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: isDualPaneHorizontal
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Expanded(flex: 5, child: RequestEditor()),
-                    const VerticalDivider(width: 1, thickness: 1),
-                    const Expanded(flex: 5, child: ResponseViewer()),
+                  children: const [
+                    Expanded(flex: 5, child: RequestEditor()),
+                    VerticalDivider(width: 1, thickness: 1),
+                    Expanded(flex: 5, child: ResponseViewer()),
                   ],
                 )
               : Column(
-                  children: [
-                    const Expanded(flex: 5, child: RequestEditor()),
-                    const Divider(height: 1, thickness: 1),
-                    const Expanded(flex: 5, child: ResponseViewer()),
+                  children: const [
+                    Expanded(flex: 5, child: RequestEditor()),
+                    Divider(height: 1, thickness: 1),
+                    Expanded(flex: 5, child: ResponseViewer()),
                   ],
                 ),
         ),
@@ -184,10 +189,17 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Clear Current Request',
             onPressed: () {
-              provider.setUrl('https://jsonplaceholder.typicode.com/posts/1');
-              provider.setMethod('GET');
-              provider.setBody('');
-              provider.clearResponse();
+              clientNotifier.setUrl('https://jsonplaceholder.typicode.com/posts/1');
+              clientNotifier.setMethod('GET');
+              clientNotifier.setBody('');
+              clientNotifier.clearResponse();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () {
+              ref.read(authProvider.notifier).logout();
             },
           ),
         ],

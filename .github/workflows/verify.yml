@@ -1,0 +1,39 @@
+name: Flutter Quality Assurance Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  analyze_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Java Environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - name: Initialize Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Install Project Packages
+        run: flutter pub get
+        
+      - name: Execute Code Generation Pipeline
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+        
+      - name: Verify Code Style Conventions
+        run: flutter format --set-exit-if-changed .
+        
+      - name: Execute Static Code Linter Analysis
+        run: flutter analyze
+        
+      - name: Execute Automated Unit Tests
+        run: flutter test --coverage
