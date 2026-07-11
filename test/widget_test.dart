@@ -2,9 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:open_source_api_client/models/request_item.dart';
 import 'package:open_source_api_client/providers/client_provider.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   // Ensure we can run tests without platform issues
   TestWidgetsFlutterBinding.ensureInitialized();
+  
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
 
   group('RequestItem & ResponseItem Models', () {
     test('JSON serialization & deserialization', () {
