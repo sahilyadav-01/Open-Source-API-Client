@@ -9,7 +9,7 @@ class ApiService {
       // 1. Build URI with query parameters
       String urlStr = request.url.trim();
       if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
-        urlStr = 'https://' + urlStr;
+        urlStr = 'https://$urlStr';
       }
       Uri uri = Uri.parse(urlStr);
       if (request.params.isNotEmpty) {

@@ -86,9 +86,9 @@ class _ResponseViewerState extends State<ResponseViewer> with SingleTickerProvid
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: statusColor.withOpacity(0.3)),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     response.statusCode == -1 ? 'ERROR' : 'STATUS: ${response.statusCode}',

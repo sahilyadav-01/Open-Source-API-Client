@@ -102,9 +102,9 @@ class HistorySidebar extends StatelessWidget {
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(vertical: 4),
               decoration: BoxDecoration(
-                color: methodColor.withOpacity(0.12),
+                color: methodColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: methodColor.withOpacity(0.3)),
+                border: Border.all(color: methodColor.withValues(alpha: 0.3)),
               ),
               child: Text(
                 item.method,
@@ -159,7 +159,7 @@ class HistorySidebar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 16, color: Colors.grey),
               onPressed: () => provider.deleteHistoryItem(item.id),
-              hoverColor: Colors.red.withOpacity(0.1),
+              hoverColor: Colors.red.withValues(alpha: 0.1),
               tooltip: 'Delete',
             ),
           ],
