@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../errors/exceptions.dart';
 
 class AuthInterceptor extends Interceptor {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
@@ -27,8 +28,7 @@ class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401) {
-      // Handle 401 Unauthorized globally
-      // You can throw a custom exception or trigger a logout event
+      throw const UnauthorizedException('Unauthorized access. Token may be invalid or expired.');
     }
     return handler.next(err);
   }

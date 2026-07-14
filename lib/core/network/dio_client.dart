@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'auth_interceptor.dart';
 import 'rate_limit_interceptor.dart';
+import 'connectivity_interceptor.dart';
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
@@ -19,8 +21,19 @@ class DioClient {
     );
 
     _dio.interceptors.addAll([
+      ConnectivityInterceptor(),
       AuthInterceptor(),
       RateLimitInterceptor(),
+      RetryInterceptor(
+        dio: _dio,
+        logPrint: print,
+        retries: 3,
+        retryDelays: const [
+          Duration(seconds: 1),
+          Duration(seconds: 2),
+          Duration(seconds: 3),
+        ],
+      ),
       LogInterceptor(responseBody: true, requestBody: true),
     ]);
   }
