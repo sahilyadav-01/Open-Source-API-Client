@@ -3,7 +3,7 @@ import 'github_user_entity.dart';
 
 part 'github_repo_entity.g.dart';
 
-@Collection()
+@collection
 class GithubRepoEntity {
   Id id = Isar.autoIncrement;
 

@@ -2,7 +2,7 @@ import 'package:isar_community/isar_community.dart';
 
 part 'github_user_entity.g.dart';
 
-@Collection()
+@collection
 class GithubUserEntity {
   Id id = Isar.autoIncrement; // you can also use id = null to auto increment
 

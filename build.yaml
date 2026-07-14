@@ -4,12 +4,11 @@ targets:
       riverpod_generator:
         generate_for:
           include:
-            - lib/features/**
-            - lib/core/**
+            - lib/features/**/presentation/*.dart
       isar_community_generator:
         generate_for:
           include:
-            - lib/core/database/entities/**
+            - lib/core/database/entities/*.dart
       freezed:freezed:
         generate_for:
           include:
