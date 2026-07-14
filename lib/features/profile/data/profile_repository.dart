@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar_community.dart';
 import '../../../core/database/isar_database.dart';
 import '../../../core/database/entities/github_user_entity.dart';
 import '../../../core/network/dio_client.dart';
