@@ -4,21 +4,20 @@ targets:
       riverpod_generator:
         generate_for:
           include:
-            - lib/providers/**
-            - lib/routing/**
+            - lib/features/**
+            - lib/core/**
       isar_community_generator:
         generate_for:
           include:
-            - lib/models/request_history.dart
+            - lib/core/database/entities/**
       freezed:freezed:
         generate_for:
           include:
-            - lib/models/key_value_item.dart
-            - lib/models/request_item.dart
-            - lib/providers/client_provider.dart
+            - lib/features/**
       json_serializable:
         options:
           explicit_to_json: true
+          field_rename: snake
         generate_for:
           include:
-            - lib/models/**
+            - lib/features/**
