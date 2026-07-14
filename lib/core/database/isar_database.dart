@@ -3,6 +3,10 @@ import 'package:path_provider/path_provider.dart';
 
 import 'entities/github_user_entity.dart';
 import 'entities/github_repo_entity.dart';
+import 'entities/search_history_entity.dart';
+import 'entities/starred_repo_entity.dart';
+import 'entities/follower_entity.dart';
+import 'entities/following_entity.dart';
 
 class IsarDatabase {
   static final IsarDatabase _instance = IsarDatabase._internal();
@@ -17,6 +21,10 @@ class IsarDatabase {
     _isar = await Isar.open([
       GithubUserEntitySchema,
       GithubRepoEntitySchema,
+      SearchHistoryEntitySchema,
+      StarredRepoEntitySchema,
+      FollowerEntitySchema,
+      FollowingEntitySchema,
     ], directory: dir.path);
   }
 
