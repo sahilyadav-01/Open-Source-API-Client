@@ -13,7 +13,10 @@ void main() {
 
     test('copyWith works', () {
       const item = KeyValueItem(key: 'Accept', value: '*/*');
-      final updated = item.copyWith(value: 'application/json', isEnabled: false);
+      final updated = item.copyWith(
+        value: 'application/json',
+        isEnabled: false,
+      );
       expect(updated.key, equals('Accept'));
       expect(updated.value, equals('application/json'));
       expect(updated.isEnabled, isFalse);

@@ -14,13 +14,10 @@ class IsarDatabase {
 
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
-    _isar = await Isar.open(
-      [
-        GithubUserEntitySchema,
-        GithubRepoEntitySchema,
-      ],
-      directory: dir.path,
-    );
+    _isar = await Isar.open([
+      GithubUserEntitySchema,
+      GithubRepoEntitySchema,
+    ], directory: dir.path);
   }
 
   Isar get isar => _isar;

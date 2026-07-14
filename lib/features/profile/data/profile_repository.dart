@@ -16,27 +16,27 @@ class ProfileRepository {
         .loginEqualTo(username)
         .watch(fireImmediately: true)
         .map((entities) {
-      if (entities.isEmpty) return null;
-      final entity = entities.first;
-      return GithubUser(
-        id: entity.githubId,
-        login: entity.login,
-        avatarUrl: entity.avatarUrl,
-        htmlUrl: entity.htmlUrl,
-        name: entity.name,
-        company: entity.company,
-        blog: entity.blog,
-        location: entity.location,
-        email: entity.email,
-        bio: entity.bio,
-        publicRepos: entity.publicRepos,
-        publicGists: entity.publicGists,
-        followers: entity.followers,
-        following: entity.following,
-        createdAt: entity.createdAt,
-        updatedAt: entity.updatedAt,
-      );
-    });
+          if (entities.isEmpty) return null;
+          final entity = entities.first;
+          return GithubUser(
+            id: entity.githubId,
+            login: entity.login,
+            avatarUrl: entity.avatarUrl,
+            htmlUrl: entity.htmlUrl,
+            name: entity.name,
+            company: entity.company,
+            blog: entity.blog,
+            location: entity.location,
+            email: entity.email,
+            bio: entity.bio,
+            publicRepos: entity.publicRepos,
+            publicGists: entity.publicGists,
+            followers: entity.followers,
+            following: entity.following,
+            createdAt: entity.createdAt,
+            updatedAt: entity.updatedAt,
+          );
+        });
   }
 
   Future<void> syncUser(String username) async {
@@ -44,7 +44,7 @@ class ProfileRepository {
       final response = await _dio.get('/users/$username');
       if (response.statusCode == 200) {
         final githubUser = GithubUser.fromJson(response.data);
-        
+
         final entity = GithubUserEntity()
           ..githubId = githubUser.id
           ..login = githubUser.login

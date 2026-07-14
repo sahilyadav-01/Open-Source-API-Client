@@ -14,9 +14,7 @@ class DioClient {
         baseUrl: 'https://api.github.com',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-        },
+        headers: {'Accept': 'application/vnd.github.v3+json'},
       ),
     );
 

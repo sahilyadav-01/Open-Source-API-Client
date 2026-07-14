@@ -6,11 +6,12 @@ class AuthInterceptor extends Interceptor {
 
   @override
   Future<void> onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // First, try to get the token from compile-time variables (e.g. --dart-define-from-file=.env)
     String? token = const String.fromEnvironment('GITHUB_TOKEN');
-    
+
     if (token.isEmpty) {
       // Fallback to secure storage if the token is acquired at runtime
       token = await _secureStorage.read(key: 'github_token') ?? '';

@@ -5,7 +5,7 @@ import 'repos_controller.dart';
 
 class ReposScreen extends ConsumerStatefulWidget {
   final String username;
-  
+
   const ReposScreen({Key? key, required this.username}) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class _ReposScreenState extends ConsumerState<ReposScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
-  
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -29,17 +29,20 @@ class _ReposScreenState extends ConsumerState<ReposScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       // Trigger load more
       _page++;
-      ref.read(reposControllerProvider(widget.username).notifier).loadMore(widget.username, _page);
+      ref
+          .read(reposControllerProvider(widget.username).notifier)
+          .loadMore(widget.username, _page);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final reposAsync = ref.watch(reposControllerProvider(widget.username));
-    
+
     return Scaffold(
       appBar: AppBar(title: Text('${widget.username} Repositories')),
       body: reposAsync.when(

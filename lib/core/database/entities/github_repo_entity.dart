@@ -12,8 +12,8 @@ class GithubRepoEntity {
 
   late String name;
   late String fullName;
-  
-  // We'll store a simple relation or embedded object. 
+
+  // We'll store a simple relation or embedded object.
   // For Isar, we can just store the owner login and avatarUrl for list views.
   late String ownerLogin;
   late String ownerAvatarUrl;

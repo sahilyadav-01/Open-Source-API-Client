@@ -14,7 +14,9 @@ class ReposController extends _$ReposController {
   @override
   Stream<List<GithubRepo>> build(String username) {
     // Start background sync (page 1 by default)
-    ref.read(githubRepoRepositoryProvider).syncUserRepos(username).catchError((_) {
+    ref.read(githubRepoRepositoryProvider).syncUserRepos(username).catchError((
+      _,
+    ) {
       // Ignored for offline-first resilience
     });
 
@@ -24,7 +26,9 @@ class ReposController extends _$ReposController {
 
   Future<void> loadMore(String username, int page) async {
     try {
-      await ref.read(githubRepoRepositoryProvider).syncUserRepos(username, page: page);
+      await ref
+          .read(githubRepoRepositoryProvider)
+          .syncUserRepos(username, page: page);
     } catch (e) {
       // Handle error gracefully or propagate to UI
     }

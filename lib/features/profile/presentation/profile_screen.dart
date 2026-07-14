@@ -5,13 +5,13 @@ import 'profile_controller.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final String username;
-  
+
   const ProfileScreen({Key? key, required this.username}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(profileControllerProvider(username));
-    
+
     return Scaffold(
       appBar: AppBar(title: Text('$username Profile')),
       body: profileAsync.when(
@@ -29,7 +29,10 @@ class ProfileScreen extends ConsumerWidget {
                   backgroundImage: NetworkImage(user.avatarUrl),
                 ),
                 const SizedBox(height: 16),
-                Text(user.name ?? user.login, style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  user.name ?? user.login,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 8),
                 Text(user.bio ?? 'No bio provided.'),
                 const SizedBox(height: 16),

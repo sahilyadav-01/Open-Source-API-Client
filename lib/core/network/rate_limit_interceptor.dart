@@ -4,7 +4,7 @@ class RateLimitInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final remaining = response.headers.value('x-ratelimit-remaining');
-    
+
     if (remaining != null) {
       final remainingCount = int.tryParse(remaining) ?? -1;
       if (remainingCount == 0) {
@@ -12,7 +12,7 @@ class RateLimitInterceptor extends Interceptor {
         // so the UI can show a banner.
       }
     }
-    
+
     return handler.next(response);
   }
 
