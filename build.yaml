@@ -5,6 +5,7 @@ targets:
         generate_for:
           include:
             - lib/features/**/presentation/*.dart
+            - lib/core/router/*.dart
       isar_community_generator:
         generate_for:
           include:
