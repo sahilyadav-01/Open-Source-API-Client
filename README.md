@@ -1,10 +1,10 @@
-# Antigravity API Client
+# Advanced GitHub API Client
 
 [![Verify Action Status](https://github.com/sahilyadav-01/Open-Source-API-Client/actions/workflows/verify.yml/badge.svg)](https://github.com/sahilyadav-01/Open-Source-API-Client/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-v3.10+-02569B.svg?logo=flutter&logoColor=white)](https://flutter.dev)
 
-A production-grade, enterprise-ready reference API Client built in Flutter. This workspace implements secure native key management, type-safe compile-time state generation, automatic offline caching databases, and declarative routing with authentication guards.
+A production-grade, enterprise-ready reference GitHub API Client built in Flutter. This workspace implements a feature-first architecture, secure native key management, type-safe compile-time state generation, automatic offline caching databases, and declarative routing with authentication guards.
 
 ---
 
@@ -16,15 +16,15 @@ The workspace follows a clean, reactive architecture with unidirectional data fl
 flowchart TD
     subgraph UI ["User Interface (Consumer Widgets)"]
         LS["LoginScreen"]
-        HS["HomeScreen"]
-        RE["RequestEditor"]
-        RV["ResponseViewer"]
-        HSB["HistorySidebar"]
+        MS["MainScaffold"]
+        PS["ProfileScreen"]
+        RS["ReposScreen"]
+        RDS["RepoDetailScreen"]
     end
 
     subgraph State ["State Management (Riverpod Providers)"]
-        AP["AuthProvider (Notifier)"]
-        CP["ClientProvider (Notifier)"]
+        AP["Auth Controller (Notifier)"]
+        CP["Feature Controllers (Notifier)"]
     end
 
     subgraph Service ["Infrastructure Services"]
@@ -33,13 +33,15 @@ flowchart TD
         API["ApiService (Dio Engine)"]
     end
 
-    HS -->|watches| CP
+    MS -->|watches| AP
+    PS -->|watches| CP
+    RS -->|watches| CP
     LS -->|submits credentials| AP
     AP -->|reads/writes credentials| SS
-    CP -->|queries/saves requests| DB
+    CP -->|queries/saves cache| DB
     CP -->|triggers requests| API
     API -->|injects token interceptor| SS
-    API -->|makes network call| External[("REST API")]
+    API -->|makes network call| External[("GitHub REST API")]
 ```
 
 ---
@@ -59,12 +61,13 @@ flowchart TD
 
 ```text
 lib/
-├── models/         # Freezed data models & database schemas
-├── providers/      # Riverpod business logic & notifiers
-├── routing/        # GoRouter navigation paths & guards
-├── screens/        # Screen UI components (Login, Dashboard)
-├── services/       # Dio network, Isar database, Secure storage
-└── widgets/        # Modular dashboard panels (Editor, Viewer)
+├── core/           # Core infrastructure (api, database, router, etc.)
+├── features/       # Feature-driven modules (auth, profile, repositories, etc.)
+│   ├── auth/       # Authentication screens and logic
+│   ├── profile/    # GitHub Profile screens and logic
+│   └── repositories/# Repository listing and details
+├── l10n/           # Localization support
+└── main.dart       # Application entry point
 ```
 
 ---
