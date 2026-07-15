@@ -1,5 +1,4 @@
-import 'package:isar_community/isar_community.dart';
-import 'github_user_entity.dart';
+import 'package:isar_community/isar.dart';
 
 part 'github_repo_entity.g.dart';
 

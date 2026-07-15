@@ -2,11 +2,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/github_repo_repository.dart';
 import '../domain/github_repo.dart';
 
+import '../../../core/providers/core_providers.dart';
+
 part 'repos_controller.g.dart';
 
 @riverpod
 GithubRepoRepository githubRepoRepository(GithubRepoRepositoryRef ref) {
-  return GithubRepoRepository();
+  final apiClient = ref.watch(apiClientProvider);
+  final isar = ref.watch(isarProvider);
+  return GithubRepoRepository(apiClient: apiClient, isar: isar);
 }
 
 @riverpod
@@ -31,6 +35,14 @@ class ReposController extends _$ReposController {
           .syncUserRepos(username, page: page);
     } catch (e) {
       // Handle error gracefully or propagate to UI
+    }
+  }
+
+  Future<void> refresh() async {
+    try {
+      await ref.read(githubRepoRepositoryProvider).syncUserRepos(username, page: 1);
+    } catch (e) {
+      // Ignore
     }
   }
 }

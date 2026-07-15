@@ -1,5 +1,4 @@
-import 'package:isar_community/isar_community.dart';
-import 'github_user_entity.dart';
+import 'package:isar_community/isar.dart';
 
 part 'follower_entity.g.dart';
 
@@ -7,8 +6,11 @@ part 'follower_entity.g.dart';
 class FollowerEntity {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true, replace: true)
+  @Index(unique: true, replace: true, composite: [CompositeIndex('targetUsername')])
   late String username;
+
+  @Index()
+  late String targetUsername;
 
   late String avatarUrl;
 }

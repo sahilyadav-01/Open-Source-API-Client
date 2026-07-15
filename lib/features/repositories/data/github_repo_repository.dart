@@ -1,14 +1,18 @@
-import 'package:dio/dio.dart';
-import 'package:isar_community/isar_community.dart';
-import '../../../core/database/isar_database.dart';
+import 'package:isar_community/isar.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/database/entities/github_repo_entity.dart';
-import '../../../core/network/dio_client.dart';
 import '../domain/github_repo.dart';
 import '../../profile/domain/github_user.dart';
 
 class GithubRepoRepository {
-  final Dio _dio = DioClient().dio;
-  final Isar _isar = IsarDatabase().isar;
+  final ApiClient _apiClient;
+  final Isar _isar;
+
+  GithubRepoRepository({
+    required ApiClient apiClient,
+    required Isar isar,
+  })  : _apiClient = apiClient,
+        _isar = isar;
 
   Stream<List<GithubRepo>> watchUserRepos(String username) {
     return _isar.githubRepoEntitys
@@ -50,13 +54,13 @@ class GithubRepoRepository {
     int perPage = 30,
   }) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.get(
         '/users/$username/repos',
         queryParameters: {'page': page, 'per_page': perPage},
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+      if (response != null) {
+        final List<dynamic> data = response;
         final repos = data.map((json) => GithubRepo.fromJson(json)).toList();
 
         final entities = repos

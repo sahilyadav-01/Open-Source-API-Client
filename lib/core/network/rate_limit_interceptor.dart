@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../errors/exceptions.dart';
+import '../exceptions/app_exceptions.dart';
 
 class RateLimitInterceptor extends Interceptor {
   @override
@@ -9,7 +9,7 @@ class RateLimitInterceptor extends Interceptor {
     if (remaining != null) {
       final remainingCount = int.tryParse(remaining) ?? -1;
       if (remainingCount == 0) {
-        throw const RateLimitException('Rate limit exceeded from header.');
+        throw RateLimitException('Rate limit exceeded from header.');
       }
     }
 
@@ -21,7 +21,7 @@ class RateLimitInterceptor extends Interceptor {
     if (err.response?.statusCode == 403) {
       final remaining = err.response?.headers.value('x-ratelimit-remaining');
       if (remaining == '0') {
-        throw const RateLimitException('Rate limit exceeded with 403 status.');
+        throw RateLimitException('Rate limit exceeded with 403 status.');
       }
     }
     return handler.next(err);

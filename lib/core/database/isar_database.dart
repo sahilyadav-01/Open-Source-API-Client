@@ -1,4 +1,4 @@
-import 'package:isar_community/isar_community.dart';
+import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'entities/github_user_entity.dart';
@@ -7,6 +7,7 @@ import 'entities/search_history_entity.dart';
 import 'entities/starred_repo_entity.dart';
 import 'entities/follower_entity.dart';
 import 'entities/following_entity.dart';
+import 'entities/cache_entity.dart';
 
 class IsarDatabase {
   static final IsarDatabase _instance = IsarDatabase._internal();
@@ -25,8 +26,15 @@ class IsarDatabase {
       StarredRepoEntitySchema,
       FollowerEntitySchema,
       FollowingEntitySchema,
+      CacheEntitySchema,
     ], directory: dir.path);
   }
 
   Isar get isar => _isar;
+
+  Future<void> clearAll() async {
+    await _isar.writeTxn(() async {
+      await _isar.clear();
+    });
+  }
 }

@@ -5,7 +5,10 @@ targets:
         generate_for:
           include:
             - lib/features/**/presentation/*.dart
+            - lib/features/**/data/*.dart
             - lib/core/router/*.dart
+            - lib/core/providers/*.dart
+            - lib/core/theme/*.dart
       isar_community_generator:
         generate_for:
           include:

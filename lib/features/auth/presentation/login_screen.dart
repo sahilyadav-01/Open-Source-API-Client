@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -18,15 +18,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    // Basic mock login
-    if (_tokenController.text.isNotEmpty) {
-      context.go('/profile');
+  Future<void> _login() async {
+    final token = _tokenController.text.trim();
+    if (token.isNotEmpty) {
+      await ref.read(authControllerProvider.notifier).login(token);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
+
+    // Show error if login fails
+    ref.listen<AsyncValue<String?>>(authControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(state.error.toString())),
+        );
+      }
+    });
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -46,15 +58,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   prefixIcon: Icon(Icons.key),
                 ),
                 obscureText: true,
+                enabled: !isLoading,
               ),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: _login,
+                onPressed: isLoading ? null : _login,
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   padding: const EdgeInsets.all(16),
                 ),
-                child: const Text('Login'),
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text('Login'),
               ),
             ],
           ),

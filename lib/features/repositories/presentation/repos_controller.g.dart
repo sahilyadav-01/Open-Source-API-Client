@@ -7,7 +7,7 @@ part of 'repos_controller.dart';
 // **************************************************************************
 
 String _$githubRepoRepositoryHash() =>
-    r'e9cf541b4f0d656211bf358d63ce3a0f965941fd';
+    r'3a6fb34b0a3e27437ffc726ebe485b7e2ac70bdf';
 
 /// See also [githubRepoRepository].
 @ProviderFor(githubRepoRepository)
@@ -25,7 +25,7 @@ final githubRepoRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef GithubRepoRepositoryRef = AutoDisposeProviderRef<GithubRepoRepository>;
-String _$reposControllerHash() => r'c8367fcc1a2ab3f76ba5d3660734500497a31679';
+String _$reposControllerHash() => r'569c66ba16016a1e0652fb13105913552bf260bf';
 
 /// Copied from Dart SDK
 class _SystemHash {

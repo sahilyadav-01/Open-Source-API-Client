@@ -13,6 +13,8 @@ import '../../features/starred/presentation/starred_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../widgets/main_scaffold.dart';
 
+import '../../features/auth/presentation/auth_controller.dart';
+
 part 'app_router.g.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -20,19 +22,22 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>()
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
-  // We can add auth state listener here to redirect.
-  // For now, we mock auth state.
-  final isAuthenticated = true;
+  final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/profile',
     redirect: (context, state) {
-      if (!isAuthenticated && state.uri.path != '/login') {
-        return '/login';
-      }
+      final username = authState.valueOrNull;
+      final isAuth = username != null;
+      final isLoggingIn = state.uri.toString() == '/login';
+
+      if (!isAuth && !isLoggingIn) return '/login';
+      if (isAuth && isLoggingIn) return '/profile';
+      
       return null;
     },
+
     routes: [
       GoRoute(
         path: '/login',
@@ -44,11 +49,17 @@ GoRouter appRouter(AppRouterRef ref) {
         routes: [
           GoRoute(
             path: '/profile',
-            builder: (context, state) => const ProfileScreen(username: 'sahilyadav-01'),
+            builder: (context, state) {
+              final username = ref.read(authControllerProvider).valueOrNull ?? 'sahilyadav-01';
+              return ProfileScreen(username: username);
+            },
           ),
           GoRoute(
             path: '/repos',
-            builder: (context, state) => const ReposScreen(username: 'sahilyadav-01'),
+            builder: (context, state) {
+              final username = ref.read(authControllerProvider).valueOrNull ?? 'sahilyadav-01';
+              return ReposScreen(username: username);
+            },
           ),
           GoRoute(
             path: '/settings',
@@ -74,7 +85,12 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
       GoRoute(
         path: '/repo_detail',
-        builder: (context, state) => const RepoDetailScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final owner = extra['owner'] as String? ?? '';
+          final repoName = extra['repoName'] as String? ?? '';
+          return RepoDetailScreen(owner: owner, repoName: repoName);
+        },
       ),
     ],
   );
