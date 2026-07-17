@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
@@ -10,23 +11,41 @@ class MainScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (int index) => _onItemTapped(index, context),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+              width: 1,
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.source),
-            label: 'Repositories',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _calculateSelectedIndex(context),
+          onTap: (int index) => _onItemTapped(index, context),
+          type: BottomNavigationBarType.fixed,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.user),
+              activeIcon: Icon(LucideIcons.user),
+              label: 'Profile',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.folder),
+              activeIcon: Icon(LucideIcons.folder),
+              label: 'Repositories',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.settings),
+              activeIcon: Icon(LucideIcons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
     );
   }
