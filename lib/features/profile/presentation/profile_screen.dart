@@ -16,12 +16,6 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.share),
-            onPressed: () {}, // Placeholder for share
-          ),
-        ],
       ),
       body: profileAsync.when(
         data: (user) {
@@ -105,20 +99,22 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                Card(
-                  margin: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      if (user.location != null)
-                        _buildInfoTile(context, LucideIcons.mapPin, user.location!),
-                      if (user.company != null)
-                        _buildInfoTile(context, LucideIcons.building, user.company!),
-                      if (user.blog != null && user.blog!.isNotEmpty)
-                        _buildInfoTile(context, LucideIcons.link, user.blog!),
-                    ],
+                if (user.location != null || user.company != null || (user.blog != null && user.blog!.isNotEmpty)) ...[
+                  const SizedBox(height: 24),
+                  Card(
+                    margin: EdgeInsets.zero,
+                    child: Column(
+                      children: [
+                        if (user.location != null)
+                          _buildInfoTile(context, LucideIcons.mapPin, user.location!),
+                        if (user.company != null)
+                          _buildInfoTile(context, LucideIcons.building, user.company!),
+                        if (user.blog != null && user.blog!.isNotEmpty)
+                          _buildInfoTile(context, LucideIcons.link, user.blog!),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           );
