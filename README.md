@@ -49,6 +49,7 @@ flowchart TD
 ## ✨ Key Features
 
 - **🔑 Secure Credentials Vault:** Wraps native credentials using `flutter_secure_storage`. Android payloads are encrypted via AES inside Android Keystore wrappers, and iOS tokens are stored in the Keychain using security bindings.
+- **🎨 Premium Modern UI:** Completely overhauled GitHub-inspired Dark Mode aesthetic featuring crisp typography (Google Fonts - Inter), clean modern icons (`lucide_icons`), glassmorphic login interfaces, and structured stat cards.
 - **🗄️ Offline DB Caching:** Incorporates `isar_community` local NoSQL database to persist history log records. Queries, modifications, and deletions are handled through ACID-compliant transactions.
 - **🛣️ Declarative Routing:** Configured with `go_router` supporting deep-linking. An automated routing guard watches authentication status from Riverpod and redirects unauthenticated users to `/login`.
 - **📦 Code-Generated State Safety:** State containers are powered by `flutter_riverpod` with compile-time code-generators (`riverpod_generator`), ensuring type safety and structural reliability.
