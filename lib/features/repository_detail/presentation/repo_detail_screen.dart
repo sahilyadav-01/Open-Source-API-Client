@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'repo_detail_controller.dart';
 import '../../issues/presentation/widgets/issues_tab.dart';
 import '../../pull_requests/presentation/widgets/pull_requests_tab.dart';
@@ -27,7 +28,7 @@ class RepoDetailScreen extends ConsumerWidget {
           title: Text(repoName),
           actions: [
             IconButton(
-              icon: const Icon(Icons.open_in_browser),
+              icon: const Icon(LucideIcons.externalLink),
               onPressed: () async {
                 final url = Uri.parse('https://github.com/$owner/$repoName');
                 if (await canLaunchUrl(url)) {
