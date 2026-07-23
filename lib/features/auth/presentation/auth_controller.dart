@@ -11,7 +11,7 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
   return AuthRepository(secureStorage: secureStorage, apiClient: apiClient);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthController extends _$AuthController {
   @override
   AsyncValue<String?> build() {
@@ -39,9 +39,7 @@ class AuthController extends _$AuthController {
       final username = await repository.getAuthenticatedUsername();
       state = AsyncValue.data(username ?? 'sahilyadav-01');
     } else {
-      state = AsyncValue.error('Invalid token', StackTrace.current);
-      // Revert back to unauthenticated on failure
-      state = const AsyncValue.data(null);
+      state = AsyncValue.error('Invalid token. Please check your credentials and try again.', StackTrace.current);
     }
   }
 

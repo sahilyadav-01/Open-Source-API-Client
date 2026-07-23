@@ -47,6 +47,11 @@ ApiClient apiClient(ApiClientRef ref) {
         Duration(seconds: 2),
         Duration(seconds: 3),
       ],
+      retryEvaluator: DefaultRetryEvaluator({
+        ...defaultRetryableStatuses,
+        403,
+        429,
+      }).evaluate,
     ),
     LogInterceptor(responseBody: true, requestBody: true),
   ]);
